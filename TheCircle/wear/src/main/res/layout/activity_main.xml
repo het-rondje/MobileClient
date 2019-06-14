@@ -19,7 +19,16 @@
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="95dp"
+            android:layout_marginTop="60dp"
             android:text="@string/hello_world" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="50dp"
+            android:src="@drawable/users" />
 
     </FrameLayout>
 </android.support.wear.widget.BoxInsetLayout>

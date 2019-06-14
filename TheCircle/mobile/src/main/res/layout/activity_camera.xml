@@ -7,50 +7,31 @@
     android:layout_height="match_parent">
 
     <SurfaceView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:id="@+id/surfaceView"
-        />
-
-    <EditText
-        android:inputType="textUri"
         android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageButton
+        android:id="@+id/switch_camera"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="20dp"
-        android:id="@+id/et_rtp_url"
-        />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="25dp"
+        android:background="#00FFFFFF"
+        app:srcCompat="@drawable/switch_btn_small" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/b_start_stop"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
-        android:gravity="center"
-        >
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="24dp"
+        android:background="#00FFFFFF"
+        app:srcCompat="@drawable/start_btn" />
 
-        <Button
-            android:text="Start record"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:id="@+id/b_record"
-            />
-
-        <Button
-            android:text="Strart stream"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:id="@+id/b_start_stop"
-            />
-
-        <Button
-            android:text="Switch camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/switch_camera"
-            />
-    </LinearLayout>
 </RelativeLayout>
