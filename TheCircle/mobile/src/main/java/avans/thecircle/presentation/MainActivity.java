@@ -1,14 +1,19 @@
 package avans.thecircle.presentation;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import avans.thecircle.R;
+import avans.thecircle.interfaces.AuthenticationTaskListener;
+import avans.thecircle.utilities.ReponseState;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AuthenticationTaskListener {
 
 
 
@@ -27,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
+    @Override
+    public void onAuthResponse(ReponseState state, String token, String userId) {
+        if (state == ReponseState.SUCCESS) {
+            SharedPreferences sharedPref = getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("token", token);
+            editor.putString("userId", userId);
+            editor.apply();
+    }
 }
