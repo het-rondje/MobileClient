@@ -1,4 +1,4 @@
-package avans.thecircle;
+package avans.thecircle.presentation;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -8,19 +8,18 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
-import avans.thecircle.R;;
+
+import avans.thecircle.domain.Message;
+import avans.thecircle.R;
+import avans.thecircle.adapters.MessageAdapter;;
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 public class CameraActivity extends AppCompatActivity

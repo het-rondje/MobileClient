@@ -1,4 +1,4 @@
-package avans.thecircle;
+package avans.thecircle.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import avans.thecircle.domain.Message;
+import avans.thecircle.R;
 
 public class MessageAdapter extends BaseAdapter {
 

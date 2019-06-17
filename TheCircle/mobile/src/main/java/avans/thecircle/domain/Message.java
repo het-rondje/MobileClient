@@ -1,4 +1,4 @@
-package avans.thecircle;
+package avans.thecircle.domain;
 
 public class Message {
     private String text;
