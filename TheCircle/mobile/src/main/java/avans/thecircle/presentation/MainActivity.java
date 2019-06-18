@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import avans.thecircle.R;
+import avans.thecircle.api.AuthenticationTask;
 import avans.thecircle.interfaces.AuthenticationTaskListener;
 import avans.thecircle.utilities.ReponseState;
 
@@ -22,15 +24,23 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
         setContentView(R.layout.activity_main);
 
         Button buttonOne = findViewById(R.id.loginBtn);
+
         buttonOne.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
-                startActivity(activity2Intent);
+                EditText key = findViewById(R.id.key);
+                EditText userId = findViewById(R.id.userId);
+                logIn(key.getText().toString(), userId.getText().toString());
             }
         });
     }
 
 
+    public void logIn(String key, String userId) {
+        AuthenticationTask authenticationTask = new AuthenticationTask(this.getApplicationContext(), this, userId, key);
+        authenticationTask.execute();
+//        Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
+//        startActivity(activity2Intent);
+    }
     @Override
     public void onAuthResponse(ReponseState state, String token, String userId) {
         if (state == ReponseState.SUCCESS) {
@@ -39,7 +49,8 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
             editor.putString("token", token);
             editor.putString("userId", userId);
             editor.apply();
+            Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
+            startActivity(activity2Intent);
         }
-
     }
 }

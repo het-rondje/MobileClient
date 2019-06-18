@@ -20,12 +20,32 @@
         app:srcCompat="@drawable/logo" />
 
     <EditText
-        android:id="@+id/key"
+        android:id="@+id/userId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="99dp"
+        android:layout_marginEnd="99dp"
         android:ems="10"
-        android:hint="Key"
+        android:hint="User Id"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/key"
+        android:layout_width="207dp"
+        android:layout_height="49dp"
+        android:layout_above="@+id/loginBtn"
+        android:layout_below="@+id/userId"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="98dp"
+        android:layout_marginTop="55dp"
+        android:layout_marginEnd="106dp"
+        android:layout_marginBottom="58dp"
+        android:ems="10"
+        android:hint="Private Key"
         android:inputType="text" />
 
     <Button
