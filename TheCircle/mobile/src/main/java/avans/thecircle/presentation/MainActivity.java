@@ -16,7 +16,6 @@ import avans.thecircle.utilities.ReponseState;
 public class MainActivity extends AppCompatActivity implements AuthenticationTaskListener {
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,5 +39,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
             editor.putString("token", token);
             editor.putString("userId", userId);
             editor.apply();
+        }
+
     }
 }
