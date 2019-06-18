@@ -38,15 +38,14 @@ public class AuthenticationTask extends AsyncTask<String, Void, Response> {
     private Context context;
     private String userId;
     private String signature;
-    private String key;
     private Timestamp timeStamp;
 
-    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId, String key) {
+    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId, String signature, Timestamp timestamp) {
         this.context = context;
         this.listener = listener;
         this.userId = userId;
-        this.key = key;
-        this.timeStamp = new Timestamp(System.currentTimeMillis());
+        this.timeStamp = timestamp;
+        this.signature = signature;
     }
 
     @Override
@@ -55,77 +54,13 @@ public class AuthenticationTask extends AsyncTask<String, Void, Response> {
         RequestBody body = new FormBody.Builder()
                 .build();
 
-        String txt = this.timeStamp.toString();
-        if (txt.length() > 0) {
-            JSONObject message = new JSONObject();
-
-            try {
-
-                //Hash text
-                MessageDigest digest;
-                digest = MessageDigest.getInstance("SHA-256");
-                digest.update(txt.getBytes());
-                byte[] magnitude = digest.digest();
-                BigInteger bi = new BigInteger(1, magnitude);
-                String hash = String.format("%0" + (magnitude.length << 1) + "x", bi);
-                StringBuilder pkcs8Lines = new StringBuilder();
-                BufferedReader rdr = new BufferedReader(new StringReader(this.key));
-                String line;
-                while ((line = rdr.readLine()) != null) {
-                    pkcs8Lines.append(line);
-                }
-                // Remove the "BEGIN" and "END" lines, as well as any whitespace
-                String pkcs8Pem = pkcs8Lines.toString();
-                pkcs8Pem = pkcs8Pem.replace("-----BEGIN PRIVATE KEY-----", "");
-                pkcs8Pem = pkcs8Pem.replace("-----END PRIVATE KEY-----", "");
-                String replaced = pkcs8Pem.replaceAll("(\\\\n)","");
-                Log.e("TAGGGGG",""+replaced);
-                byte [] pkcs8EncodedBytes = android.util.Base64.decode(replaced, Base64.DEFAULT);
-                // extract the private key
-                PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8EncodedBytes);
-                KeyFactory kf = KeyFactory.getInstance("RSA");
-                PrivateKey privKey = kf.generatePrivate(keySpec);
-                System.out.println(privKey);
-                Signature signer = Signature.getInstance("SHA256withRSA");
-                signer.initSign(privKey);
-                signer.update(hash.getBytes());
-                byte[] signature = signer.sign();
-                String encryptHash = new String(signature);
-                Log.e("HASH", encryptHash);
-                this.signature = encryptHash;
-
-
-                message.put("text",txt);
-                message.put("sender","");
-                message.put("roomId","_rFGS_JEC");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-            } catch (SignatureException e) {
-                e.printStackTrace();
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-        else
-        {
-            //TODO: TOAST TOEVOEGEN
-        }
-
 
         Request request = new Request.Builder()
                 .url(API_URL + userId)
                 .post(body)
-                .addHeader("userId", userId)
-                .addHeader("timeStamp", timeStamp.toString())
-                .addHeader("timeSignature", signature)
+                .addHeader("userId", this.userId)
+                .addHeader("timeStamp", this.timeStamp.toString())
+                .addHeader("timeSignature", this.signature)
                 .build();
 
         try {
