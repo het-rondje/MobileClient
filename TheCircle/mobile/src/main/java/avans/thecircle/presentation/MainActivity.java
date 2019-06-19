@@ -56,74 +56,74 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
 
 
     public void logIn(String key, String userId) {
-        Date date = new Date();
-        Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
-        String txt = timeStamp.toString();
-        if (txt.length() > 0) {
+//        Date date = new Date();
+//        Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+//        String txt = timeStamp.toString();
+//        if (txt.length() > 0) {
+//
+//
+//            try {
+//
+//                //Hash text
+//                MessageDigest digest;
+//                digest = MessageDigest.getInstance("SHA-256");
+//                digest.update(txt.getBytes());
+//                byte[] magnitude = digest.digest();
+//                BigInteger bi = new BigInteger(1, magnitude);
+//                String hash = String.format("%0" + (magnitude.length << 1) + "x", bi);
+//                StringBuilder pkcs8Lines = new StringBuilder();
+//                BufferedReader rdr = new BufferedReader(new StringReader(key));
+//                String line;
+//                while ((line = rdr.readLine()) != null) {
+//                    pkcs8Lines.append(line);
+//                }
+//                // Remove the "BEGIN" and "END" lines, as well as any whitespace
+//                String pkcs8Pem = pkcs8Lines.toString();
+//                pkcs8Pem = pkcs8Pem.replace("-----BEGIN PRIVATE KEY-----", "");
+//                pkcs8Pem = pkcs8Pem.replace("-----END PRIVATE KEY-----", "");
+//                String replaced = pkcs8Pem.replaceAll("(\\\\n)","");
+//                Log.e("TAGGGGG",""+replaced);
+//                byte [] pkcs8EncodedBytes = android.util.Base64.decode(replaced, Base64.DEFAULT);
+//                // extract the private key
+//                PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8EncodedBytes);
+//                KeyFactory kf = KeyFactory.getInstance("RSA");
+//                PrivateKey privKey = kf.generatePrivate(keySpec);
+//                System.out.println(privKey);
+//                Signature signer = Signature.getInstance("SHA256withRSA");
+//                signer.initSign(privKey);
+//                signer.update(hash.getBytes());
+//                byte[] signature = signer.sign();
+//                StringBuilder hexBuilder = new StringBuilder();
+//                for(byte b: signature){
+//                    hexBuilder.append(String.format("%02x", b));
+//                }
+//                String encryptHash = hexBuilder.toString();
+//                Log.e("ENCRYPTHASH", encryptHash);
+//
+//                AuthenticationTask authenticationTask = new AuthenticationTask(this.getApplicationContext(), this, userId, encryptHash, timeStamp);
+//                authenticationTask.execute();
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (NoSuchAlgorithmException e) {
+//                e.printStackTrace();
+//            } catch (InvalidKeyException e) {
+//                e.printStackTrace();
+//            } catch (SignatureException e) {
+//                e.printStackTrace();
+//            } catch (InvalidKeySpecException e) {
+//                e.printStackTrace();
+//            }
+//
+//
+//        }
+//        else
+//        {
+//            //TODO: TOAST TOEVOEGEN
+//        }
 
-
-            try {
-
-                //Hash text
-                MessageDigest digest;
-                digest = MessageDigest.getInstance("SHA-256");
-                digest.update(txt.getBytes());
-                byte[] magnitude = digest.digest();
-                BigInteger bi = new BigInteger(1, magnitude);
-                String hash = String.format("%0" + (magnitude.length << 1) + "x", bi);
-                StringBuilder pkcs8Lines = new StringBuilder();
-                BufferedReader rdr = new BufferedReader(new StringReader(key));
-                String line;
-                while ((line = rdr.readLine()) != null) {
-                    pkcs8Lines.append(line);
-                }
-                // Remove the "BEGIN" and "END" lines, as well as any whitespace
-                String pkcs8Pem = pkcs8Lines.toString();
-                pkcs8Pem = pkcs8Pem.replace("-----BEGIN PRIVATE KEY-----", "");
-                pkcs8Pem = pkcs8Pem.replace("-----END PRIVATE KEY-----", "");
-                String replaced = pkcs8Pem.replaceAll("(\\\\n)","");
-                Log.e("TAGGGGG",""+replaced);
-                byte [] pkcs8EncodedBytes = android.util.Base64.decode(replaced, Base64.DEFAULT);
-                // extract the private key
-                PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(pkcs8EncodedBytes);
-                KeyFactory kf = KeyFactory.getInstance("RSA");
-                PrivateKey privKey = kf.generatePrivate(keySpec);
-                System.out.println(privKey);
-                Signature signer = Signature.getInstance("SHA256withRSA");
-                signer.initSign(privKey);
-                signer.update(hash.getBytes());
-                byte[] signature = signer.sign();
-                StringBuilder hexBuilder = new StringBuilder();
-                for(byte b: signature){
-                    hexBuilder.append(String.format("%02x", b));
-                }
-                String encryptHash = hexBuilder.toString();
-                Log.e("ENCRYPTHASH", encryptHash);
-
-                AuthenticationTask authenticationTask = new AuthenticationTask(this.getApplicationContext(), this, userId, encryptHash, timeStamp);
-                authenticationTask.execute();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-            } catch (SignatureException e) {
-                e.printStackTrace();
-            } catch (InvalidKeySpecException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-        else
-        {
-            //TODO: TOAST TOEVOEGEN
-        }
-
-//        Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
-//        startActivity(activity2Intent);
+        Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
+        startActivity(activity2Intent);
     }
     @Override
     public void onAuthResponse(ReponseState state, String token, String userId) {

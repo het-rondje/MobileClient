@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -11,19 +12,26 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 
+import avans.thecircle.api.GetViewers;
 import avans.thecircle.domain.Message;
 import avans.thecircle.R;
-import avans.thecircle.adapters.MessageAdapter;;
+import avans.thecircle.adapters.MessageAdapter;
+import avans.thecircle.interfaces.OnTaskComplete;
+import avans.thecircle.interfaces.OnViewersAvailable;
+import avans.thecircle.utilities.ReponseState;;
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 public class CameraActivity extends AppCompatActivity
-        implements ConnectCheckerRtmp, View.OnClickListener, SurfaceHolder.Callback {
+        implements ConnectCheckerRtmp, View.OnClickListener, SurfaceHolder.Callback, OnViewersAvailable, OnTaskComplete {
 
     private RtmpCamera1 rtmpCamera1;
     private ImageButton button;
@@ -57,6 +65,13 @@ public class CameraActivity extends AppCompatActivity
         messageAdapter = new MessageAdapter(this);
         messagesView = (ListView) findViewById(R.id.messages_view);
         messagesView.setAdapter(messageAdapter);
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                checkViewers("eLbwB5tVW");
+            }
+        }, 0, 2000);
 
     }
 
@@ -68,6 +83,10 @@ public class CameraActivity extends AppCompatActivity
             editText.getText().clear();
             messagesView.setSelection(messageAdapter.getCount() -1);
         }
+    }
+    public void checkViewers(String id) {
+        GetViewers getViewers = new GetViewers(this, this, id);
+        getViewers.execute();
     }
 
     @Override
@@ -186,6 +205,18 @@ public class CameraActivity extends AppCompatActivity
     }
 
     public void onMessage() {
+
+    }
+
+    @Override
+    public void OnViewersAvailable(ReponseState state, String viewers) {
+       TextView TVviewers = findViewById(R.id.viewers);
+       Log.e("VIEWERS:", viewers);
+       TVviewers.setText(viewers);
+    }
+
+    @Override
+    public void onTaskComplete(ReponseState state) {
 
     }
 }
