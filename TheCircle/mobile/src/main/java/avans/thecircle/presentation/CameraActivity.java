@@ -56,7 +56,7 @@ public class CameraActivity extends AppCompatActivity
     private RtmpCamera1 rtmpCamera1;
     private ImageButton button;
     private EditText etUrl;
-    private String streamUrl = "test";
+    private String streamUrl = "rtmp://145.49.4.200/live/aladk?name=Jorrit";
     private EditText editText;
     private ListView messagesView;
     private MessageAdapter messageAdapter;

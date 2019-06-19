@@ -2,12 +2,26 @@ package avans.thecircle.api;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.sql.Timestamp;
 
 import avans.thecircle.domain.GlobalValues;
 import avans.thecircle.interfaces.AuthenticationTaskListener;
@@ -24,11 +38,13 @@ public class AuthenticationTask extends AsyncTask<String, Void, Response> {
     private Context context;
     private String userId;
     private String signature;
+    private Timestamp timeStamp;
 
-    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId, String signature) {
+    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId, String signature, Timestamp timestamp) {
         this.context = context;
         this.listener = listener;
         this.userId = userId;
+        this.timeStamp = timestamp;
         this.signature = signature;
     }
 
@@ -36,13 +52,15 @@ public class AuthenticationTask extends AsyncTask<String, Void, Response> {
     protected Response doInBackground(String... strings) {
         OkHttpClient client = new OkHttpClient();
         RequestBody body = new FormBody.Builder()
-                .add("userId", userId)
-                .add("signature", signature)
                 .build();
+
 
         Request request = new Request.Builder()
                 .url(API_URL + userId)
                 .post(body)
+                .addHeader("userId", this.userId)
+                .addHeader("timeStamp", this.timeStamp.toString())
+                .addHeader("timeSignature", this.signature)
                 .build();
 
         try {
