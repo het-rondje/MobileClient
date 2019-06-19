@@ -1,5 +1,8 @@
 package avans.thecircle.presentation;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -99,6 +102,13 @@ public class CameraActivity extends AppCompatActivity
         setContentView(R.layout.container_view);
         SurfaceView surfaceView = findViewById(R.id.surfaceView);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
+        final String userId = sharedPreferences.getString("userId", "0");
+        if(userId.equals("0")) {
+            Intent activity2Intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(activity2Intent);
+        }
+
         //create socket
         ChatApplication app = (ChatApplication) getApplication();
         socket = app.getSocket();
@@ -124,7 +134,7 @@ public class CameraActivity extends AppCompatActivity
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                checkViewers("eLbwB5tVW");
+                checkViewers(userId);
             }
         }, 0, 2000);
 

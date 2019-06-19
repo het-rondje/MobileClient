@@ -5,13 +5,21 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -30,82 +38,107 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
-public class AuthenticationTask extends AsyncTask<String, Void, Response> {
+
+
+public class AuthenticationTask extends AsyncTask<String, Void, String> {
     private static final String API_URL = GlobalValues.HOST_URL + "/api/users/";
     private AuthenticationTaskListener listener;
     private Context context;
     private String userId;
-    private String signature;
-    private Timestamp timeStamp;
 
-    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId, String signature, Timestamp timestamp) {
+
+    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId) {
         this.context = context;
         this.listener = listener;
         this.userId = userId;
-        this.timeStamp = timestamp;
-        this.signature = signature;
     }
 
     @Override
-    protected Response doInBackground(String... strings) {
-        OkHttpClient client = new OkHttpClient();
-        RequestBody body = new FormBody.Builder()
-                .build();
-
-
-        Request request = new Request.Builder()
-                .url(API_URL + userId)
-                .post(body)
-                .addHeader("userId", this.userId)
-                .addHeader("timeStamp", this.timeStamp.toString())
-                .addHeader("timeSignature", this.signature)
-                .build();
+    protected String doInBackground(String... strings) {
+        InputStream inputStream = null;
+        int responsCode = -1;
+        String serverUrl = GlobalValues.HOST_URL + "/api/users/" + this.userId;
+        String response = "";
+        if(this.userId.length() == 0) {
+            return "";
+        }
 
         try {
-            Response response = client.newCall(request).execute();
-            return response;
+            URL url = new URL(serverUrl);
+            URLConnection urlConnection = url.openConnection();
+            if (!(urlConnection instanceof HttpURLConnection)) {
+                return "";
+            }
+            HttpURLConnection httpConnection = (HttpURLConnection) urlConnection;
+            httpConnection.setConnectTimeout(16000);
+            httpConnection.setReadTimeout(16000);
+            httpConnection.setAllowUserInteraction(false);
+            httpConnection.setInstanceFollowRedirects(true);
+            httpConnection.setRequestMethod("GET");
+
+            httpConnection.connect();
+            inputStream = httpConnection.getInputStream();
+
+            response = getStringFromInputStream(inputStream);
+
+
+
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         } catch (IOException e) {
-            Log.e(this.getClass().getSimpleName(), "Error doing post!", e);
-            return null;
+            e.printStackTrace();
         }
+
+        return response;
+
     }
     @Override
-    protected void onPostExecute(Response response) {
-
-
-        if(response == null){
-            Log.e(this.getClass().getSimpleName(), "Api request had an error and the response returned null!");
-            return;
+    protected void onPostExecute(String response) {
+        Log.e("res",response);
+        if(response.length() == 0){
+            listener.onAuthResponse(ReponseState.INVALID_CREDENTIALS, "");
+        } else {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                String id = jsonObject.get("_id").toString();
+                listener.onAuthResponse(ReponseState.SUCCESS, id);
+            } catch (JSONException e) {
+                Log.d("Error", e.toString());
+            }
         }
 
+
+
+    }
+
+    private static String getStringFromInputStream(InputStream is) {
+
+        BufferedReader br = null;
+        StringBuilder sb = new StringBuilder();
+
+        String line;
         try {
-            int code = response.code();
-            String json = response.body().string();
 
-            if(code == 412){
-                listener.onAuthResponse(ReponseState.INVALID_CREDENTIALS, "", "");
-                return;
-            }
-
-            if(code == 200){
-                JSONObject jsonObject = new JSONObject(json);
-
-                String token = jsonObject.getString("token");
-                String roomName = jsonObject.getString("userId");
-
-                listener.onAuthResponse(ReponseState.SUCCESS, token, roomName);
-
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
             }
 
         } catch (IOException e) {
-            Log.e(this.getClass().getSimpleName(), "Error while processing response body", e);
-        } catch (JSONException e) {
-            Log.e(this.getClass().getSimpleName(), "Error while parsing json", e);
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
-
+        return sb.toString();
     }
 
 }

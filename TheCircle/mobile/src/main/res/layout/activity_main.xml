@@ -32,21 +32,6 @@
         android:hint="User Id"
         android:inputType="text" />
 
-    <EditText
-        android:id="@+id/key"
-        android:layout_width="207dp"
-        android:layout_height="49dp"
-        android:layout_above="@+id/loginBtn"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="98dp"
-        android:layout_marginTop="55dp"
-        android:layout_marginEnd="106dp"
-        android:layout_marginBottom="58dp"
-        android:ems="10"
-        android:hint="Private Key"
-        android:inputType="text" />
-
     <Button
         android:id="@+id/loginBtn"
         android:layout_width="218dp"
