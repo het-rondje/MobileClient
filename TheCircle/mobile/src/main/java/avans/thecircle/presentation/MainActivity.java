@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
         Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
         String txt = timeStamp.toString();
         if (txt.length() > 0) {
-            JSONObject message = new JSONObject();
+
 
             try {
 
@@ -93,18 +93,16 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
                 signer.initSign(privKey);
                 signer.update(hash.getBytes());
                 byte[] signature = signer.sign();
-                String encryptHash = new String(signature);
-                Log.e("HASH", encryptHash);
+                StringBuilder hexBuilder = new StringBuilder();
+                for(byte b: signature){
+                    hexBuilder.append(String.format("%02x", b));
+                }
+                String encryptHash = hexBuilder.toString();
+                Log.e("ENCRYPTHASH", encryptHash);
 
                 AuthenticationTask authenticationTask = new AuthenticationTask(this.getApplicationContext(), this, userId, encryptHash, timeStamp);
                 authenticationTask.execute();
 
-
-                message.put("text",txt);
-                message.put("sender","");
-                message.put("roomId","_rFGS_JEC");
-            } catch (JSONException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NoSuchAlgorithmException e) {
@@ -130,13 +128,23 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
     @Override
     public void onAuthResponse(ReponseState state, String token, String userId) {
         if (state == ReponseState.SUCCESS) {
-            SharedPreferences sharedPref = getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("token", token);
-            editor.putString("userId", userId);
-            editor.apply();
+//            SharedPreferences sharedPref = getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE);
+//            SharedPreferences.Editor editor = sharedPref.edit();
+//            editor.putString("token", token);
+//            editor.putString("userId", userId);
+//            editor.apply();
+            // TODO: ACTIONS ON LOGIN SUCCESS
             Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
             startActivity(activity2Intent);
         }
+    }
+    public static String bytesToHex(byte[] bytes, char[] hexArray) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 }

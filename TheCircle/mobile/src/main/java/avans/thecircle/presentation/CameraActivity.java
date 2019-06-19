@@ -56,7 +56,7 @@ public class CameraActivity extends AppCompatActivity
     private RtmpCamera1 rtmpCamera1;
     private ImageButton button;
     private EditText etUrl;
-    private String streamUrl = "rtmp://145.49.4.200/live/aladk?name=Jorrit";
+    private String streamUrl = "rtmp://159.65.197.36:1936/live?key=mykey";
     private EditText editText;
     private ListView messagesView;
     private MessageAdapter messageAdapter;
@@ -133,7 +133,7 @@ public class CameraActivity extends AppCompatActivity
                     Toast.makeText(CameraActivity.this, "Connection failed. " + reason, Toast.LENGTH_SHORT)
                             .show();
                     rtmpCamera1.stopStream();
-                    //button.setText("Start streaming");
+                    button.setImageResource(R.drawable.start_btn);
                 }
             }
         });
@@ -176,14 +176,14 @@ public class CameraActivity extends AppCompatActivity
                 if (!rtmpCamera1.isStreaming()) {
                     if (rtmpCamera1.isRecording()
                             || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo()) {
-                       // button.setText("Stop streaming");
+                        button.setImageResource(R.drawable.stop_btn);
                         rtmpCamera1.startStream(streamUrl);
                     } else {
                         Toast.makeText(this, "Error preparing stream, This device cant do it",
                                 Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                   // button.setText("Start streaming");
+                    button.setImageResource(R.drawable.start_btn);
                     rtmpCamera1.stopStream();
                 }
                 break;
@@ -220,7 +220,7 @@ public class CameraActivity extends AppCompatActivity
         }
         if (rtmpCamera1.isStreaming()) {
             rtmpCamera1.stopStream();
-           // button.setText("Start streaming");
+            button.setImageResource(R.drawable.start_btn);
         }
         rtmpCamera1.stopPreview();
     }
