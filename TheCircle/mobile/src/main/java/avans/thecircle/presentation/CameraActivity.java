@@ -14,6 +14,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 
@@ -24,11 +32,17 @@ import avans.thecircle.adapters.MessageAdapter;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -41,6 +55,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,6 +75,7 @@ public class CameraActivity extends AppCompatActivity
     private EditText editText;
     private ListView messagesView;
     private MessageAdapter messageAdapter;
+    private JSONObject user;
 
     private String currentDateAndTime = "";
     private File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -102,9 +118,9 @@ public class CameraActivity extends AppCompatActivity
             JSONObject message = new JSONObject();
             String signature = EncryptMessage(txt);
             message.put("text",txt);
-            message.put("roomId","_rFGS_JEC");
+            message.put("roomId","eLbwB5tVW");
             message.put("signature",signature);
-            message.put("sender","_rFGS_JEC") ;
+            message.put("sender","eLbwB5tVW") ;
             editText.getText().clear();
             socket.emit("message",message);
         }
@@ -224,6 +240,34 @@ public class CameraActivity extends AppCompatActivity
         }
         rtmpCamera1.stopPreview();
     }
+    public void getUser(String Id, final Message message) {
+        String url = "http://145.49.22.248:3001/api/users/" + Id;
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        Request stringRequest = new StringRequest(Request.Method.GET,url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    user = new JSONObject(response);
+                    Addmessage(new Message(message.getText(),user.get("firstName")+" "+user.get("lastName")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(stringRequest);
+    }
+    public void Addmessage(Message message)
+    {
+        messageAdapter.add(message);
+
+        messagesView.setSelection(messageAdapter.getCount() -1);
+    }
+
     public String EncryptMessage(String text){
         try{
             //Hash Message
@@ -291,7 +335,7 @@ public class CameraActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    socket.emit("join","_rFGS_JEC");
+                    socket.emit("join","eLbwB5tVW");
                     //TODO: USER ID FROM USER LOGIN MUST COME HERE
                 }
             });
@@ -308,13 +352,10 @@ public class CameraActivity extends AppCompatActivity
                         //extract data from fired event
 
                         String msg = data.getString("text");
-
+                        String sender = data.getString("sender");
                         // make instance of message
-
-                        Message message = new Message(msg, "Jorrit076");
-                        messageAdapter.add(message);
-
-                        messagesView.setSelection(messageAdapter.getCount() -1);
+                        Message message = new Message(msg,"");
+                        getUser(sender,message);
 
                     } catch (JSONException e) {
                         e.printStackTrace();

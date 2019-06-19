@@ -468,68 +468,37 @@ public class RtmpConnection implements RtmpPublisher {
 
   @Override
   public void publishAudioData(byte[] data, int size, int dts) {
-    try{
-      if (data == null
-              || data.length == 0
-              || dts < 0
-              || !connected
-              || currentStreamId == 0
-              || !publishPermitted) {
-        return;
-      }
-      Audio audio = new Audio();
-      audio.setData(data, size);
-      audio.getHeader().setAbsoluteTimestamp(dts);
-      audio.getHeader().setMessageStreamId(currentStreamId);
-      MessageDigest digest;
-      digest = MessageDigest.getInstance("SHA-256");
-      digest.update(audio.getData());
-      byte[] magnitude = digest.digest();
-      BigInteger bi = new BigInteger(1, magnitude);
-      String hash = String.format("%0" + (magnitude.length << 1) + "x", bi);
-      Log.e("ERROR","======================"+hash);
-      sendAudioMeta(hash);
-      sendRtmpPacket(audio);
+    if (data == null
+            || data.length == 0
+            || dts < 0
+            || !connected
+            || currentStreamId == 0
+            || !publishPermitted) {
+      return;
     }
-
-    catch (NoSuchAlgorithmException e)
-    {
-      e.printStackTrace();
-    }
+    Audio audio = new Audio();
+    audio.setData(data, size);
+    audio.getHeader().setAbsoluteTimestamp(dts);
+    audio.getHeader().setMessageStreamId(currentStreamId);
+    sendRtmpPacket(audio);
 
   }
 
   @Override
   public void publishVideoData(byte[] data, int size, int dts) {
-    try{
-      if (data == null
-              || data.length == 0
-              || dts < 0
-              || !connected
-              || currentStreamId == 0
-              || !publishPermitted) {
-        return;
-      }
-      Video video = new Video();
-      video.setData(data, size);
-      video.getHeader().setAbsoluteTimestamp(dts);
-      video.getHeader().setMessageStreamId(currentStreamId);
-      MessageDigest digest;
-      digest = MessageDigest.getInstance("SHA-256");
-      digest.update(video.getData());
-      byte[] magnitude = digest.digest();
-      BigInteger bi = new BigInteger(1, magnitude);
-      String hash = String.format("%0" + (magnitude.length << 1) + "x", bi);
-      sendVideoMeta(hash);
-      sendRtmpPacket(video);
+    if (data == null
+            || data.length == 0
+            || dts < 0
+            || !connected
+            || currentStreamId == 0
+            || !publishPermitted) {
+      return;
     }
-    catch (NoSuchAlgorithmException e)
-    {
-      e.printStackTrace();
-    }
-
-
-
+    Video video = new Video();
+    video.setData(data, size);
+    video.getHeader().setAbsoluteTimestamp(dts);
+    video.getHeader().setMessageStreamId(currentStreamId);
+    sendRtmpPacket(video);
 
   }
 
@@ -775,74 +744,5 @@ public class RtmpConnection implements RtmpPublisher {
   public void setAuthorization(String user, String password) {
     this.user = user;
     this.password = password;
-  }
-  public void sendVideoMeta(String hash)
-  {
-
-      try {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        KeyPair pair = keyGen.generateKeyPair();
-        PrivateKey priv = pair.getPrivate();
-        PublicKey pub = pair.getPublic();
-
-        Signature signer = Signature.getInstance("SHA1withRSA");
-        Log.e("ERRORSIGNATURE",""+hash.getBytes());
-        signer.update(hash.getBytes());
-        signer.initSign(priv); // PKCS#8 is preferred
-        byte[] signature = signer.sign();
-        String hashstring = new String(signature);
-
-        Data metadata = new Data("onMetaData");
-        metadata.getHeader().setMessageStreamId(currentStreamId);
-        AmfMap ecmaArray = new AmfMap();
-        ecmaArray.setProperty("Type","Video");
-        ecmaArray.setProperty("hash",hashstring);
-        metadata.addData(ecmaArray);
-        sendRtmpPacket(metadata);
-
-
-      } catch (SignatureException e) {
-        e.printStackTrace();
-      } catch (InvalidKeyException e) {
-        e.printStackTrace();
-      }
-      catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    }
-
-  }
-  public void sendAudioMeta(String hash)
-  {
-    try {
-      KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-      KeyPair pair = keyGen.generateKeyPair();
-      PrivateKey priv = pair.getPrivate();
-      PublicKey pub = pair.getPublic();
-
-      Signature signer = Signature.getInstance("SHA1withRSA");
-      Log.e("ERRORSIGNATURE",""+hash.getBytes());
-      signer.initSign(priv); // PKCS#8 is preferred
-      signer.update(hash.getBytes());
-      byte[] signature = signer.sign();
-      String hashstring = new String(signature);
-
-      Data metadata = new Data("onMetaData");
-      metadata.getHeader().setMessageStreamId(currentStreamId);
-      AmfMap ecmaArray = new AmfMap();
-      ecmaArray.setProperty("Type","Audio");
-      ecmaArray.setProperty("hash",hashstring);
-      ecmaArray.setProperty("PublicKey",pub.toString());
-      metadata.addData(ecmaArray);
-      sendRtmpPacket(metadata);
-
-
-    } catch (SignatureException e) {
-      e.printStackTrace();
-    }  catch (InvalidKeyException e) {
-      e.printStackTrace();
-    }
-    catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    }
   }
 }
