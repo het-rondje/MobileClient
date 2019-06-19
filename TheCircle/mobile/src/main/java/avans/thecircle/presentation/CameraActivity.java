@@ -84,8 +84,9 @@ public class CameraActivity extends AppCompatActivity
     private Socket socket;
     private RtmpCamera1 rtmpCamera1;
     private ImageButton button;
+    private ImageButton pauseBtn;
     private EditText etUrl;
-    private String streamUrl = "rtmp://159.65.197.36:1936/live?key=mykey";
+    private String streamUrl = "rtmp://159.65.197.36:1936/live/";
     private EditText editText;
     private ListView messagesView;
     private MessageAdapter messageAdapter;
@@ -109,6 +110,7 @@ public class CameraActivity extends AppCompatActivity
             Intent activity2Intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(activity2Intent);
         }
+        streamUrl = streamUrl + userId;
 
         //create socket
         ChatApplication app = (ChatApplication) getApplication();
@@ -121,8 +123,10 @@ public class CameraActivity extends AppCompatActivity
         button.setOnClickListener(this);
         ImageButton switchCamera = findViewById(R.id.switch_camera);
         switchCamera.setOnClickListener(this);
-//        etUrl = findViewById(R.id.et_rtp_url);
-//        etUrl.setHint("URL");
+
+        pauseBtn = findViewById(R.id.b_pause_start);
+        pauseBtn.setOnClickListener(this);
+        pauseBtn.setVisibility(View.GONE);
         rtmpCamera1 = new RtmpCamera1(surfaceView, this);
         rtmpCamera1.setReTries(10);
         surfaceView.getHolder().addCallback(this);
@@ -183,6 +187,7 @@ public class CameraActivity extends AppCompatActivity
                             .show();
                     rtmpCamera1.stopStream();
                     button.setImageResource(R.drawable.start_btn);
+                    pauseBtn.setVisibility(View.GONE);
                 }
             }
         });
@@ -226,6 +231,7 @@ public class CameraActivity extends AppCompatActivity
                     if (rtmpCamera1.isRecording()
                             || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo()) {
                         button.setImageResource(R.drawable.stop_btn);
+                        pauseBtn.setVisibility(View.VISIBLE);
                         rtmpCamera1.startStream(streamUrl);
                     } else {
                         Toast.makeText(this, "Error preparing stream, This device cant do it",
@@ -233,6 +239,7 @@ public class CameraActivity extends AppCompatActivity
                     }
                 } else {
                     button.setImageResource(R.drawable.start_btn);
+                    pauseBtn.setVisibility(View.GONE);
                     rtmpCamera1.stopStream();
                 }
                 break;
@@ -243,6 +250,17 @@ public class CameraActivity extends AppCompatActivity
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.b_pause_start:
+                if(rtmpCamera1.isVideoEnabled()) {
+                    rtmpCamera1.disableVideo();
+                    rtmpCamera1.disableAudio();
+                    pauseBtn.setImageResource(R.drawable.start_btn);
+                } else {
+                    rtmpCamera1.enableVideo();
+                    rtmpCamera1.disableAudio();
+                    pauseBtn.setImageResource(R.drawable.pause_btn);
+                }
+
             default:
                 break;
         }
@@ -270,11 +288,12 @@ public class CameraActivity extends AppCompatActivity
         if (rtmpCamera1.isStreaming()) {
             rtmpCamera1.stopStream();
             button.setImageResource(R.drawable.start_btn);
+            pauseBtn.setVisibility(View.GONE);
         }
         rtmpCamera1.stopPreview();
     }
     public void getUser(String Id, final Message message) {
-        String url = "http://145.49.22.248:3001/api/users/" + Id;
+        String url = "http://159.65.197.36:3001/api/users/" + Id;
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         Request stringRequest = new StringRequest(Request.Method.GET,url, new Response.Listener<String>() {
             @Override
