@@ -1,8 +1,12 @@
 package avans.thecircle.presentation;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -55,8 +59,6 @@ public class CameraActivity extends AppCompatActivity
         button.setOnClickListener(this);
         ImageButton switchCamera = findViewById(R.id.switch_camera);
         switchCamera.setOnClickListener(this);
-//        etUrl = findViewById(R.id.et_rtp_url);
-//        etUrl.setHint("URL");
         rtmpCamera1 = new RtmpCamera1(surfaceView, this);
         rtmpCamera1.setReTries(10);
         surfaceView.getHolder().addCallback(this);
@@ -87,6 +89,11 @@ public class CameraActivity extends AppCompatActivity
     public void checkViewers(String id) {
         GetViewers getViewers = new GetViewers(this, this, id);
         getViewers.execute();
+    }
+    public void disableCamera() {
+        SurfaceView surfaceView = findViewById(R.id.surfaceView);
+        surfaceView.setVisibility(View.INVISIBLE);
+        Log.e("ACTION", "DISABLE");
     }
 
     @Override
@@ -173,6 +180,9 @@ public class CameraActivity extends AppCompatActivity
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.b_pause_start:
+                disableCamera();
+                break;
             default:
                 break;
         }
@@ -211,7 +221,6 @@ public class CameraActivity extends AppCompatActivity
     @Override
     public void OnViewersAvailable(ReponseState state, String viewers) {
        TextView TVviewers = findViewById(R.id.viewers);
-       Log.e("VIEWERS:", viewers);
        TVviewers.setText(viewers);
     }
 

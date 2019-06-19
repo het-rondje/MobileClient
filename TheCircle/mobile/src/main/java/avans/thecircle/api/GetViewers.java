@@ -52,9 +52,8 @@ public class GetViewers extends AsyncTask<String, Void, String> {
 
             httpConnection.connect();
 
-                inputStream = httpConnection.getInputStream();
-
-                response = getStringFromInputStream(inputStream);
+            inputStream = httpConnection.getInputStream();
+            response = getStringFromInputStream(inputStream);
 
 
         } catch (ProtocolException e) {

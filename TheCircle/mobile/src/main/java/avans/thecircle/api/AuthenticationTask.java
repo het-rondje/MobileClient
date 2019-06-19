@@ -37,30 +37,20 @@ public class AuthenticationTask extends AsyncTask<String, Void, Response> {
     private AuthenticationTaskListener listener;
     private Context context;
     private String userId;
-    private String signature;
-    private Timestamp timeStamp;
 
-    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId, String signature, Timestamp timestamp) {
+
+    public AuthenticationTask(Context context, AuthenticationTaskListener listener, String userId) {
         this.context = context;
         this.listener = listener;
         this.userId = userId;
-        this.timeStamp = timestamp;
-        this.signature = signature;
     }
 
     @Override
     protected Response doInBackground(String... strings) {
         OkHttpClient client = new OkHttpClient();
-        RequestBody body = new FormBody.Builder()
-                .build();
-
-
         Request request = new Request.Builder()
                 .url(API_URL + userId)
-                .post(body)
-                .addHeader("userId", this.userId)
-                .addHeader("timeStamp", this.timeStamp.toString())
-                .addHeader("timeSignature", this.signature)
+                .get()
                 .build();
 
         try {
@@ -84,19 +74,17 @@ public class AuthenticationTask extends AsyncTask<String, Void, Response> {
             int code = response.code();
             String json = response.body().string();
 
-            if(code == 412){
-                listener.onAuthResponse(ReponseState.INVALID_CREDENTIALS, "", "");
-                return;
-            }
 
             if(code == 200){
                 JSONObject jsonObject = new JSONObject(json);
 
-                String token = jsonObject.getString("token");
-                String roomName = jsonObject.getString("userId");
+                String userId = jsonObject.getString("_id");
 
-                listener.onAuthResponse(ReponseState.SUCCESS, token, roomName);
+                listener.onAuthResponse(ReponseState.SUCCESS, userId);
 
+            } else {
+                listener.onAuthResponse(ReponseState.INVALID_CREDENTIALS, "");
+                return;
             }
 
         } catch (IOException e) {
