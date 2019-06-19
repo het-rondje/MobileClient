@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
         Date date = new Date();
         Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
         String txt = timeStamp.toString();
-        if (txt.length() > 0) {
+/*        if (txt.length() > 0) {
 
 
             try {
@@ -120,10 +120,10 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
         else
         {
             //TODO: TOAST TOEVOEGEN
-        }
+        }*/
 
-//        Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
-//        startActivity(activity2Intent);
+        Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
+        startActivity(activity2Intent);
     }
     @Override
     public void onAuthResponse(ReponseState state, String token, String userId) {
