@@ -90,6 +90,7 @@ public class CameraActivity extends AppCompatActivity
     private ListView messagesView;
     private MessageAdapter messageAdapter;
     private JSONObject user;
+    private String userId;
 
     private String currentDateAndTime = "";
     private File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -103,7 +104,7 @@ public class CameraActivity extends AppCompatActivity
         SurfaceView surfaceView = findViewById(R.id.surfaceView);
 
         SharedPreferences sharedPreferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
-        final String userId = sharedPreferences.getString("userId", "0");
+        userId = sharedPreferences.getString("userId", "0");
         if(userId.equals("0")) {
             Intent activity2Intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(activity2Intent);
@@ -146,9 +147,9 @@ public class CameraActivity extends AppCompatActivity
             JSONObject message = new JSONObject();
             String signature = EncryptMessage(txt);
             message.put("text",txt);
-            message.put("roomId","eLbwB5tVW");
+            message.put("roomId",userId);
             message.put("signature",signature);
-            message.put("sender","eLbwB5tVW") ;
+            message.put("sender",userId) ;
             editText.getText().clear();
             socket.emit("message",message);
         }
@@ -367,7 +368,7 @@ public class CameraActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    socket.emit("join","eLbwB5tVW");
+                    socket.emit("join",userId);
                     //TODO: USER ID FROM USER LOGIN MUST COME HERE
                 }
             });

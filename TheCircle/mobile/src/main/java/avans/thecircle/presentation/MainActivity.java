@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
             // TODO: ACTIONS ON LOGIN SUCCESS
             Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
             startActivity(activity2Intent);
-        }
+        }   
         else {
             Toast.makeText(MainActivity.this, "Invalid User Id", Toast.LENGTH_SHORT).show();
         }
