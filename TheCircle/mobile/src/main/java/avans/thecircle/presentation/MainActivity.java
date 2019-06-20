@@ -1,8 +1,12 @@
 package avans.thecircle.presentation;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -10,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,15 +52,21 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
 
         buttonOne.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                EditText key = findViewById(R.id.key);
                 EditText userId = findViewById(R.id.userId);
-                logIn(key.getText().toString(), userId.getText().toString());
+                logIn(userId.getText().toString());
             }
         });
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, 1);
+        }
     }
 
 
-    public void logIn(String key, String userId) {
+    public void logIn(String userId) {
 //        Date date = new Date();
 //        Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 //        String txt = timeStamp.toString();
@@ -121,21 +132,24 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
 //        {
 //            //TODO: TOAST TOEVOEGEN
 //        }
-
-        Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
-        startActivity(activity2Intent);
+        AuthenticationTask authenticationTask = new AuthenticationTask(this.getApplicationContext(), this, userId);
+        authenticationTask.execute();
+//        Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
+//        startActivity(activity2Intent);
     }
     @Override
-    public void onAuthResponse(ReponseState state, String token, String userId) {
+    public void onAuthResponse(ReponseState state, String userId) {
         if (state == ReponseState.SUCCESS) {
-//            SharedPreferences sharedPref = getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE);
-//            SharedPreferences.Editor editor = sharedPref.edit();
-//            editor.putString("token", token);
-//            editor.putString("userId", userId);
-//            editor.apply();
+            SharedPreferences sharedPref = getSharedPreferences("Settings", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("userId", userId);
+            editor.apply();
             // TODO: ACTIONS ON LOGIN SUCCESS
             Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);
             startActivity(activity2Intent);
+        }
+        else {
+            Toast.makeText(MainActivity.this, "Invalid User Id", Toast.LENGTH_SHORT).show();
         }
     }
     public static String bytesToHex(byte[] bytes, char[] hexArray) {
