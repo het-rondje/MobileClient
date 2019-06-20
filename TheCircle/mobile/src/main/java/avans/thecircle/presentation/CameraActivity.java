@@ -86,7 +86,7 @@ public class CameraActivity extends AppCompatActivity
     private ImageButton button;
     private ImageButton pauseBtn;
     private EditText etUrl;
-    private String streamUrl = "rtmp://159.65.197.36/live/";
+    private String streamUrl = "rtmp://159.65.197.36:1936/live/";
     private EditText editText;
     private ListView messagesView;
     private MessageAdapter messageAdapter;
@@ -264,7 +264,7 @@ public class CameraActivity extends AppCompatActivity
                     pauseBtn.setImageResource(R.drawable.start_btn);
                 } else {
                     rtmpCamera1.enableVideo();
-                    rtmpCamera1.disableAudio();
+                    rtmpCamera1.enableAudio();
                     pauseBtn.setImageResource(R.drawable.pause_btn);
                 }
 
