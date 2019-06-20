@@ -155,7 +155,7 @@ public class CameraActivity extends AppCompatActivity
             public void run() {
                 checkSatoshi(userId);
             }
-        }, 0, 900000);
+        }, 0, 60000);
 
     }
 
