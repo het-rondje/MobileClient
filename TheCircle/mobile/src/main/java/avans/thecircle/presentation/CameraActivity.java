@@ -139,8 +139,9 @@ public class CameraActivity extends AppCompatActivity
             message.put("roomId","eLbwB5tVW");
             message.put("signature",signature);
             message.put("sender","eLbwB5tVW") ;
+            getUser("eLbwB5tVW",message);
             editText.getText().clear();
-            socket.emit("message",message);
+
         }
     }
     public void checkViewers(String id) {
@@ -262,7 +263,7 @@ public class CameraActivity extends AppCompatActivity
         }
         rtmpCamera1.stopPreview();
     }
-    public void getUser(String Id, final Message message) {
+    public void getUser(String Id, final JSONObject message) {
         String url = "http://145.49.22.248:3001/api/users/" + Id;
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         Request stringRequest = new StringRequest(Request.Method.GET,url, new Response.Listener<String>() {
@@ -270,7 +271,10 @@ public class CameraActivity extends AppCompatActivity
             public void onResponse(String response) {
                 try {
                     user = new JSONObject(response);
-                    Addmessage(new Message(message.getText(),user.get("firstName")+" "+user.get("lastName")));
+                    message.put("firstName",user.get("firstName"));
+                    message.put("lastName",user.get("lastName"));
+                    sendessage(message);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -283,11 +287,9 @@ public class CameraActivity extends AppCompatActivity
         });
         requestQueue.add(stringRequest);
     }
-    public void Addmessage(Message message)
+    public void sendessage(JSONObject Message)
     {
-        messageAdapter.add(message);
-
-        messagesView.setSelection(messageAdapter.getCount() -1);
+        socket.emit("message",Message);
     }
 
     public String EncryptMessage(String text){
@@ -374,11 +376,11 @@ public class CameraActivity extends AppCompatActivity
                         //extract data from fired event
 
                         String msg = data.getString("text");
-                        String sender = data.getString("sender");
                         // make instance of message
-                        Message message = new Message(msg,"");
-                        getUser(sender,message);
+                        Message message = new Message(msg,data.get("firstName")+" "+data.get("lastName"));
+                        messageAdapter.add(message);
 
+                        messagesView.setSelection(messageAdapter.getCount() -1);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
