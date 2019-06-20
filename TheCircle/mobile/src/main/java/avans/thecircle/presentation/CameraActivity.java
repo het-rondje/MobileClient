@@ -30,9 +30,11 @@ import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 
 import avans.thecircle.api.ChatApplication;
+import avans.thecircle.api.GetSatoshi;
 import avans.thecircle.domain.Message;
 import avans.thecircle.R;
 import avans.thecircle.adapters.MessageAdapter;
+import avans.thecircle.interfaces.OnSatoshiAvailable;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;;
 import java.io.BufferedReader;
@@ -79,7 +81,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 public class CameraActivity extends AppCompatActivity
-        implements ConnectCheckerRtmp, View.OnClickListener, SurfaceHolder.Callback, OnViewersAvailable, OnTaskComplete {
+        implements ConnectCheckerRtmp, View.OnClickListener, SurfaceHolder.Callback, OnViewersAvailable, OnTaskComplete, OnSatoshiAvailable {
 
     private Socket socket;
     private RtmpCamera1 rtmpCamera1;
@@ -147,6 +149,14 @@ public class CameraActivity extends AppCompatActivity
             }
         }, 0, 2000);
 
+        Timer t2 = new Timer();
+        t2.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                checkSatoshi(userId);
+            }
+        }, 0, 900000);
+
     }
 
     public void sendMessage(View view) throws JSONException {
@@ -168,6 +178,10 @@ public class CameraActivity extends AppCompatActivity
     public void checkViewers(String id) {
         GetViewers getViewers = new GetViewers(this, this, id);
         getViewers.execute();
+    }
+    public void checkSatoshi(String id) {
+        GetSatoshi getSatoshi = new GetSatoshi(this, this, id);
+        getSatoshi.execute();
     }
 
     @Override
@@ -409,5 +423,11 @@ public class CameraActivity extends AppCompatActivity
     @Override
     public void onTaskComplete(ReponseState state) {
 
+    }
+
+    @Override
+    public void OnSatoshiAvailable(ReponseState state, String coins) {
+        TextView TVcoins = findViewById(R.id.coins);
+        TVcoins.setText(coins);
     }
 }
