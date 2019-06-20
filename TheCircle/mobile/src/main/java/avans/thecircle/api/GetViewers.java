@@ -3,6 +3,9 @@ package avans.thecircle.api;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,9 +72,19 @@ public class GetViewers extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String response) {
-        response = response.substring(response.length() - 2);
-        response = response.replaceAll("[^0-9]", "");
-        onViewersAvailable.OnViewersAvailable(ReponseState.SUCCESS, response);
+
+        if(response.length() == 0){
+            onViewersAvailable.OnViewersAvailable(ReponseState.ERROR, "");
+        } else {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                String count = jsonObject.get("count").toString();
+                onViewersAvailable.OnViewersAvailable(ReponseState.SUCCESS, count);
+            } catch (JSONException e) {
+                Log.d("Error", e.toString());
+            }
+        }
+
     }
 
     private static String getStringFromInputStream(InputStream is) {
