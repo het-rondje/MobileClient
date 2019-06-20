@@ -99,12 +99,14 @@ public class AuthenticationTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String response) {
         Log.e("res",response);
         if(response.length() == 0){
-            listener.onAuthResponse(ReponseState.INVALID_CREDENTIALS, "");
+            listener.onAuthResponse(ReponseState.INVALID_CREDENTIALS, "","","");
         } else {
             try {
                 JSONObject jsonObject = new JSONObject(response);
                 String id = jsonObject.get("_id").toString();
-                listener.onAuthResponse(ReponseState.SUCCESS, id);
+                String firstname = jsonObject.getString("firstName");
+                String LastName = jsonObject.getString("lastName");
+                listener.onAuthResponse(ReponseState.SUCCESS, id,LastName,firstname);
             } catch (JSONException e) {
                 Log.d("Error", e.toString());
             }

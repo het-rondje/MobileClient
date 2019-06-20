@@ -138,11 +138,13 @@ public class MainActivity extends AppCompatActivity implements AuthenticationTas
 //        startActivity(activity2Intent);
     }
     @Override
-    public void onAuthResponse(ReponseState state, String userId) {
+    public void onAuthResponse(ReponseState state, String userId,String lastname,String firstname) {
         if (state == ReponseState.SUCCESS) {
             SharedPreferences sharedPref = getSharedPreferences("Settings", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("userId", userId);
+            editor.putString("firstName", firstname);
+            editor.putString("lastName",lastname);
             editor.apply();
             // TODO: ACTIONS ON LOGIN SUCCESS
             Intent activity2Intent = new Intent(getApplicationContext(), CameraActivity.class);

@@ -86,12 +86,14 @@ public class CameraActivity extends AppCompatActivity
     private ImageButton button;
     private ImageButton pauseBtn;
     private EditText etUrl;
-    private String streamUrl = "rtmp://159.65.197.36:1936/live/";
+    private String streamUrl = "rtmp://159.65.197.36/live/";
     private EditText editText;
     private ListView messagesView;
     private MessageAdapter messageAdapter;
     private JSONObject user;
     private String userId;
+    private String firstname;
+    private String lastname;
 
     private String currentDateAndTime = "";
     private File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -106,6 +108,8 @@ public class CameraActivity extends AppCompatActivity
 
         SharedPreferences sharedPreferences = getSharedPreferences("Settings", Context.MODE_PRIVATE);
         userId = sharedPreferences.getString("userId", "0");
+        firstname = sharedPreferences.getString("firstName", "0");
+        lastname = sharedPreferences.getString("lastName", "0");
         if(userId.equals("0")) {
             Intent activity2Intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(activity2Intent);
@@ -154,7 +158,9 @@ public class CameraActivity extends AppCompatActivity
             message.put("roomId",userId);
             message.put("signature",signature);
             message.put("sender",userId) ;
-            getUser(message);
+            message.put("firstName",firstname);
+            message.put("lastName",lastname);
+            socket.emit("message",message);
             editText.getText().clear();
 
         }
@@ -293,34 +299,6 @@ public class CameraActivity extends AppCompatActivity
         }
         rtmpCamera1.stopPreview();
     }
-    public void getUser(String Id, final Message message) {
-        String url = "http://159.65.197.36:3001/api/users/" + Id;
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        Request stringRequest = new StringRequest(Request.Method.GET,url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    user = new JSONObject(response);
-                    message.put("firstName",user.get("firstName"));
-                    message.put("lastName",user.get("lastName"));
-                    sendessage(message);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-        requestQueue.add(stringRequest);
-    }
-    public void sendessage(JSONObject Message)
-    {
-        socket.emit("message",Message);
-    }
 
     public String EncryptMessage(String text){
         try{
@@ -407,7 +385,7 @@ public class CameraActivity extends AppCompatActivity
 
                         String msg = data.getString("text");
                         // make instance of message
-                        Message message = new Message(msg,data.get("firstName")+" "+data.get("lastName"));
+                        Message message = new Message(msg,data.getString("firstName")+" "+data.getString("lastName"));
                         messageAdapter.add(message);
 
                         messagesView.setSelection(messageAdapter.getCount() -1);
