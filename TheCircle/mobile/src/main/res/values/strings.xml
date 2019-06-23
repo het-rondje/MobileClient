@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">The Circle</string>
+    <string name="button_label">Send</string>
+    <string name="toast_message">Hurra!</string>
+    <string name="input_placeholder">Write a message</string>
+</resources>
